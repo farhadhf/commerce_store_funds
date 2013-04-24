@@ -124,3 +124,5 @@ function commerce_funds_deposit_funds_form_submit($form, &$form_state) {
 
   drupal_goto('checkout/' . $deposit_order->order_id);
 }
+
+

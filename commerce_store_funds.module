@@ -2,22 +2,26 @@
 /**
  * @file
  *   commerce_funds.module
+ * @todo
+ *   1. Re-Create default views.
+ *   2. Implement withdraw request module.
+ *   3. Implement escrow payments module.
  */
 
 /**
  *  Implementation of hook_views_api().
  */
-function commerce_funds_views_api() {
+function commerce_store_funds_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'commerce_funds') . '/includes/views',
+    'path' => drupal_get_path('module', 'commerce_store_funds') . '/includes/views',
   );
 }
 
 /**
  * Implements hook_permission().
  */
-function commerce_funds_permission() {
+function commerce_store_funds_permission() {
   return array(
     'view own transactions' => array(
       'title' => 'View Own Transactions',
@@ -38,11 +42,11 @@ function commerce_funds_permission() {
 /**
  * Implements hook_menu().
  */
-function commerce_funds_menu() {
+function commerce_store_funds_menu() {
 
-  $items['admin/commerce/funds'] = array(
+  $items['admin/commerce/marketplace/funds'] = array(
     'title' => 'Funds Management',
-    'description' => 'Administer Store Funds',
+    'description' => 'Administer Marketplace Store Funds',
     'page callback' => 'system_admin_menu_block_page',
     'access arguments' => array('access administration pages'),
     'file path' => drupal_get_path('module', 'system'),
@@ -50,17 +54,7 @@ function commerce_funds_menu() {
     'weight' => -15,
   );
 
-  $items['admin/commerce/config/funds'] = array(
-    'title' => 'Funds',
-    'description' => 'Configure Funds Settings',
-    'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('administer funds'),
-    'file path' => drupal_get_path('module', 'system'),
-    'file' => 'system.admin.inc',
-    'weight' => -15,
-  );
-
-  $items['admin/commerce/funds/configure/fees'] = array(
+  $items['admin/commerce/marketplace/funds/configure/fees'] = array(
     'title' => 'Fees',
     'page callback' => 'commerce_funds_configure_fees',
     'access arguments' => array('administer funds'),
@@ -73,29 +67,29 @@ function commerce_funds_menu() {
 /**
  * Implements of hook_entity_info().
  */
-function commerce_funds_entity_info() {
+function commerce_store_funds_entity_info() {
   $data = array();
 
-  $data['commerce_funds_account'] = array(
-    'label' => t('Commerce Funds account'),
-    'controller class' => 'CommerceFundsAccountEntityController',
-    'base table' => 'commerce_funds_account',
+  $data['commerce_store_funds_account'] = array(
+    'label' => t('Commerce Store Funds account'),
+    'controller class' => 'CommerceStoreFundsAccountEntityController',
+    'base table' => 'commerce_store_funds_account',
     'fieldable' => FALSE,
     'entity keys' => array(
       'id' => 'account_id',
       'label' => 'account_id',
     ),
     'bundles' => array(),
-    'load hook' => 'commerce_funds_account_load',
+    'load hook' => 'commerce_store_funds_account_load',
     'view modes' => array(
       'administrator' => array(
         'label' => t('Administrator'),
         'custom settings' => FALSE,
       ),
     ),
-    'uri callback' => 'commerce_funds_account_uri',
-    'access callback' => 'commerce_funds_account_access',
-    'token type' => 'commerce-funds-account',
+    'uri callback' => 'commerce_store_funds_account_uri',
+    'access callback' => 'commerce_store_funds_account_access',
+    'token type' => 'commerce-store-funds-account',
     'metadata controller class' => '',
     'permission labels' => array(
       'singular' => t('funds account'),
@@ -103,10 +97,10 @@ function commerce_funds_entity_info() {
     ),
   );
 
-  $data['commerce_funds_transaction'] = array(
-    'label' => t('Commerce Funds transaction'),
-    'controller class' => 'CommerceFundsTransactionEntityController',
-    'base table' => 'commerce_funds_transaction',
+  $data['commerce_store_funds_transaction'] = array(
+    'label' => t('Commerce Store Funds transaction'),
+    'controller class' => 'CommerceStoreFundsTransactionEntityController',
+    'base table' => 'commerce_store_funds_transaction',
     'fieldable' => FALSE,
     'entity keys' => array(
       'id' => 'transaction_id',
@@ -120,16 +114,16 @@ function commerce_funds_entity_info() {
       'credit' => 'Credit',
       'debit' => 'Debit',
     ),
-    'load hook' => 'commerce_funds_transaction_load',
+    'load hook' => 'commerce_store_funds_transaction_load',
     'view modes' => array(
       'administrator' => array(
         'label' => t('Administrator'),
         'custom settings' => FALSE,
       ),
     ),
-    'uri callback' => 'commerce_funds_transaction_uri',
-    'access callback' => 'commerce_funds_transaction_access',
-    'token type' => 'commerce-funds-transaction',
+    'uri callback' => 'commerce_store_funds_transaction_uri',
+    'access callback' => 'commerce_store_funds_transaction_access',
+    'token type' => 'commerce-store-funds-transaction',
     'metadata controller class' => '',
     'permission labels' => array(
       'singular' => t('funds transaction'),
@@ -146,9 +140,9 @@ function commerce_funds_entity_info() {
  * @return
  *   A transaction object with all default fields initialized.
  */
-function commerce_funds_account_new($account_user) {
-  return entity_get_controller('commerce_funds_account')->create(array(
-    'uid' => $account_user->uid,
+function commerce_store_funds_account_new($store) {
+  return entity_get_controller('commerce_store_funds_account')->create(array(
+    'store_id' => $store->id,
   ));
 }
 
@@ -161,15 +155,15 @@ function commerce_funds_account_new($account_user) {
  * @return
  *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
  */
-function commerce_funds_account_save($account) {
-  return entity_get_controller('commerce_funds_account')->save($account);
+function commerce_store_funds_account_save($account) {
+  return entity_get_controller('commerce_store_funds_account')->save($account);
 }
 
 /**
  * Loads a funds account by ID.
  */
-function commerce_funds_account_load($account_id) {
-  $accounts = entity_load('commerce_funds_account', $account_id);
+function commerce_store_funds_account_load($account_id) {
+  $accounts = entity_load('commerce_store_funds_account', $account_id);
   return $accounts ? reset($accounts) : FALSE;
 }
 
@@ -178,8 +172,8 @@ function commerce_funds_account_load($account_id) {
  *
  * @see entity_load()
  */
-function commerce_funds_account_load_by_user($account_user, $currency_code, $reset = FALSE) {
-  $accounts =  entity_load('commerce_funds_account', array(), array('uid' => $account_user->uid, 'currency_code' => $currency_code), $reset);
+function commerce_store_funds_account_load_by_store($store, $currency_code, $reset = FALSE) {
+  $accounts =  entity_load('commerce_store_funds_account', array(), array('store_id' => $store->id, 'currency_code' => $currency_code), $reset);
   return $accounts ? reset($accounts) : FALSE;
 }
 
@@ -192,8 +186,8 @@ function commerce_funds_account_load_by_user($account_user, $currency_code, $res
  * @return
  *   A transaction object with all default fields initialized.
  */
-function commerce_funds_transaction_new($type = '') {
-  return entity_get_controller('commerce_funds_transaction')->create(array(
+function commerce_store_funds_transaction_new($type = '') {
+  return entity_get_controller('commerce_store_funds_transaction')->create(array(
     'type' => $type,
   ));
 }
@@ -207,15 +201,15 @@ function commerce_funds_transaction_new($type = '') {
  * @return
  *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
  */
-function commerce_funds_transaction_save($transaction) {
-  return entity_get_controller('commerce_funds_transaction')->save($transaction);
+function commerce_store_funds_transaction_save($transaction) {
+  return entity_get_controller('commerce_store_funds_transaction')->save($transaction);
 }
 
 /**
  * Loads a funds transaction by ID.
  */
-function commerce_funds_transaction_load($transaction_id) {
-  $transactions = commerce_funds_transaction_load_multiple(array($transaction_id), array());
+function commerce_store_funds_transaction_load($transaction_id) {
+  $transactions = commerce_store_funds_transaction_load_multiple(array($transaction_id), array());
   return $transactions ? reset($transactions) : FALSE;
 }
 
@@ -235,8 +229,8 @@ function commerce_funds_transaction_load($transaction_id) {
  * @return
  *   An array of transaction objects indexed by transaction_id.
  */
-function commerce_funds_transaction_load_multiple($transaction_ids = array(), $conditions = array(), $reset = FALSE) {
-  return entity_load('commerce_funds_transaction', $transaction_ids, $conditions, $reset);
+function commerce_store_funds_transaction_load_multiple($transaction_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('commerce_store_funds_transaction', $transaction_ids, $conditions, $reset);
 }
 
 /**
@@ -248,8 +242,8 @@ function commerce_funds_transaction_load_multiple($transaction_ids = array(), $c
  * @return
  *   TRUE on success, FALSE otherwise.
  */
-function commerce_funds_transaction_delete($transaction_id) {
-  return commerce_funds_transaction_delete_multiple(array($transaction_id));
+function commerce_store_funds_transaction_delete($transaction_id) {
+  return commerce_store_funds_transaction_delete_multiple(array($transaction_id));
 }
 
 /**
@@ -261,8 +255,8 @@ function commerce_funds_transaction_delete($transaction_id) {
  * @return
  *   TRUE on success, FALSE otherwise.
  */
-function commerce_funds_transaction_delete_multiple($transaction_ids) {
-  return entity_get_controller('commerce_funds_transaction')->delete($transaction_ids);
+function commerce_store_funds_transaction_delete_multiple($transaction_ids) {
+  return entity_get_controller('commerce_store_funds_transaction')->delete($transaction_ids);
 }
 
 /**
@@ -273,24 +267,24 @@ function commerce_funds_transaction_delete_multiple($transaction_ids) {
  * @param object $amount
  *   Commerce Price
  */
-function commerce_funds_credit($account_user, $amount) {
+function commerce_store_funds_credit($store, $amount) {
 
-  $account = commerce_funds_account_load_by_user($account_user, $amount['currency_code']);
+  $account = commerce_store_funds_account_load_by_store($store, $amount['currency_code']);
 
   if (!$account) {
-    $account = commerce_funds_account_new($account_user);
-    commerce_funds_account_save($account);
+    $account = commerce_store_funds_account_new($store);
+    commerce_store_funds_account_save($account);
   }
 
   $account->balance += $amount['amount'];
 
-  $transaction = commerce_funds_transaction_new('credit');
+  $transaction = commerce_store_funds_transaction_new('credit');
   $transaction->account_id = $account->account_id;
   $transaction->amount = $amount['amount'];
   $transaction->currency_code = $amount['currency_code'];
 
-  if (commerce_funds_transaction_save($transaction)) {
-    commerce_funds_account_save($account);
+  if (commerce_store_funds_transaction_save($transaction)) {
+    commerce_store_funds_account_save($account);
   }
 }
 
@@ -302,24 +296,24 @@ function commerce_funds_credit($account_user, $amount) {
  * @param object $amount
  *   Commerce Price
  */
-function commerce_funds_debit($account_user, $amount) {
+function commerce_store_funds_debit($store, $amount) {
 
-  $account = commerce_funds_account_load_by_user($account_user, $amount['currency_code']);
+  $account = commerce_store_funds_account_load_by_user($store, $amount['currency_code']);
 
   if (!$account) {
-    $account = commerce_funds_account_new($account_user);
-    commerce_funds_account_save($account);
+    $account = commerce_store_funds_account_new($store);
+    commerce_store_funds_account_save($account);
   }
 
   $account->balance -= $amount['amount'];
 
-  $transaction = commerce_funds_transaction_new('credit');
+  $transaction = commerce_store_funds_transaction_new('credit');
   $transaction->account_id = $account->account_id;
-  $transaction->amount = - $amount['amount'];
+  $transaction->amount =- $amount['amount'];
   $transaction->currency_code = $amount['currency_code'];
 
-  if (commerce_funds_transaction_save($transaction)) {
-    commerce_funds_account_save($account);
+  if (commerce_store_funds_transaction_save($transaction)) {
+    commerce_store_funds_account_save($account);
   }
 
 }

@@ -8,7 +8,7 @@
  *
  * @ingroup views_filter_handlers
  */
-class commerce_funds_type_views_handler_filter_in_operator extends views_handler_filter_in_operator {
+class commerce_store_funds_type_views_handler_filter_in_operator extends views_handler_filter_in_operator {
   var $value_form_type = 'checkboxes';
 
   /**

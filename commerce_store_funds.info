@@ -1,0 +1,19 @@
+name =  Commerce Marketplace Store Funds
+description = Drupal funds management system
+core = 7.x
+
+dependencies[] = commerce_store
+dependencies[] = commerce_marketplace_order
+dependencies[] = rules
+
+
+; Module includes
+files[] = commerce_store_funds.rules.inc
+files[] = includes/commerce_store_funds_transaction.controller.inc
+files[] = includes/commerce_store_funds_account.controller.inc
+
+; Views handlers
+files[] = includes/views/handlers/commerce_store_funds_type_views_handler_filter_in_operator.inc
+files[] = includes/views/handlers/commerce_store_funds_status_views_handler_filter_in_operator.inc
+
+package = Commerce Marketplace

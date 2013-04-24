@@ -9,9 +9,9 @@
 /**
  * Implements hook_schema().
  */
-function commerce_funds_schema() {
-  $schema['commerce_funds_account'] = array(
-    'description' => 'User Funds',
+function commerce_store_funds_schema() {
+  $schema['commerce_store_funds_account'] = array(
+    'description' => 'Store Funds',
     'fields' => array(
       'account_id' => array(
         'description' => 'The unique account id',
@@ -19,8 +19,8 @@ function commerce_funds_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'uid' => array(
-        'description' => 'The user id for the account',
+      'store_id' => array(
+        'description' => 'The store id for the account',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
@@ -42,14 +42,14 @@ function commerce_funds_schema() {
       'account_id'
     ),
     'foreign keys' => array(
-      'uid' => array(
-        'table' => 'users',
-        'columns' => array('uid' => 'uid'),
+      'store_id' => array(
+        'table' => 'eck_commerce_store',
+        'columns' => array('store_id' => 'id'),
       ),
     ),
   );
 
-  $schema['commerce_funds_transaction'] = array(
+  $schema['commerce_store_funds_transaction'] = array(
     'description' => 'Transactions',
     'fields' => array(
       'transaction_id' => array(
@@ -64,7 +64,7 @@ function commerce_funds_schema() {
         'default' => 0,
       ),
       'uid' => array(
-        'description' => '',
+        'description' => 'The user who made the transaction',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
@@ -114,7 +114,7 @@ function commerce_funds_schema() {
         'columns' => array('uid' => 'uid'),
       ),
       'account_id' => array(
-        'table' => 'commerce_funds_account',
+        'table' => 'commerce_store_funds_account',
         'columns' => array('account_id' => 'account_id'),
       ),
     ),

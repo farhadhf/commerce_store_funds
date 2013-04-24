@@ -1,6 +1,5 @@
 <?php
 
-<?php
 /**
  * @file
 *   commerce_funds.views.inc

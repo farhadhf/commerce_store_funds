@@ -8,7 +8,7 @@
  *
  * @ingroup views_filter_handlers
  */
-class commerce_funds_type_views_handler_filter_in_operator extends views_handler_filter_in_operator {
+class commerce_store_funds_status_views_handler_filter_in_operator extends views_handler_filter_in_operator {
   var $value_form_type = 'checkboxes';
 
   /**
@@ -48,7 +48,7 @@ class commerce_funds_type_views_handler_filter_in_operator extends views_handler
       }
     }
     else {
-      $this->value_options = array('Deposit' => 'Deposit', 'Transfer' => 'Transfer', 'Escrow Payment' => 'Escrow Payment', 'Completed Escrow Payment' => 'Completed Escrow Payment');
+      $this->value_options = array('Pending Approval' => 'Pending Approval', 'Declined' => 'Declined');
     }
 
     return $this->value_options;

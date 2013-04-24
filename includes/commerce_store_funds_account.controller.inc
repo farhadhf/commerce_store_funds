@@ -10,7 +10,7 @@
  * transaction CRUD operations. The load method is inherited from the default
  * controller.
  */
-class CommerceFundsAccountEntityController extends DrupalCommerceEntityController {
+class CommerceStoreFundsAccountEntityController extends DrupalCommerceEntityController {
 
   /**
    * Create a default payment transaction.
